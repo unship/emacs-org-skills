@@ -51,6 +51,10 @@ Create diagrams from the current context using D2. Uses the dark theme with the 
 
 Create diagrams from the current context using Mermaid. Applies the Emacs foreground color via theme variable overrides for readable text on your Emacs background.
 
+### /swiftui-preview
+
+Render SwiftUI code from the current context to a PNG via `swiftc` + SwiftUI's `ImageRenderer`. Outputs the resulting image inline. Requires Swift and macOS.
+
 ### emacsclient (auto)
 
 Always prefer `emacsclient` over `emacs` when the agent needs to interact with Emacs. This skill is not a slash command; it activates automatically.
