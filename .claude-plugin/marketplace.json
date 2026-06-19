@@ -21,6 +21,7 @@
         "./skills/file-links",
         "./skills/gnuplot",
         "./skills/highlight",
+        "./skills/mappu",
         "./skills/open",
         "./skills/select"
       ]

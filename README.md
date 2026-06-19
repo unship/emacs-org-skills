@@ -55,6 +55,22 @@ Create diagrams from the current context using Mermaid. Applies the Emacs foregr
 
 Render SwiftUI code from the current context to a PNG via `swiftc` + SwiftUI's `ImageRenderer`. Outputs the resulting image inline. Requires Swift and macOS.
 
+### /xcode-build-simulator
+
+Build the Xcode workspace/project under the current working directory for the iOS Simulator (generic destination). Auto-detects the workspace/project and scheme.
+
+### /xcode-build-device
+
+Build the Xcode workspace/project under the current working directory for a physical iOS device (generic destination). Requires a configured signing team.
+
+### /xcode-run-simulator
+
+Build, install, and launch the app on an iOS Simulator. Reuses an already-booted simulator if present; otherwise boots the latest available iPhone and opens `Simulator.app`.
+
+### /xcode-run-device
+
+Build, install, and launch the app on a wired-connected iOS device via Xcode 15+ `devicectl`. Requires a configured signing team and a trusted, paired device.
+
 ### emacsclient (auto)
 
 Always prefer `emacsclient` over `emacs` when the agent needs to interact with Emacs. This skill is not a slash command; it activates automatically.
@@ -62,6 +78,10 @@ Always prefer `emacsclient` over `emacs` when the agent needs to interact with E
 ### file-links (auto)
 
 Format file references as markdown links with GitHub-style `#L` line numbers (e.g., `[file.el:42](path/to/file.el#L42)`). Activates automatically.
+
+### mappu (auto)
+
+Search Apple Maps for restaurants, cafes, businesses, or landmarks via the [mappu](https://github.com/xenodium/mappu) CLI when the user asks about a place or context implies a location lookup. Always uses `--near`; asks "Near where?" if no location is established. Returns a numbered map snapshot plus per-result image, website link, category, and address. Activates automatically. Requires `mappu` on `$PATH`.
 
 ## Requirements
 

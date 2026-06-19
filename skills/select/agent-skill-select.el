@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (require 'cl-lib)
 
 (cl-defun agent-skill-select (&key selections)

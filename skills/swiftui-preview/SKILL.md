@@ -9,9 +9,25 @@ disable-model-invocation: true
 
 Generate SwiftUI code from the most recent interaction context, render it to a PNG using `ImageRenderer`, and output it as a markdown image so it renders inline.
 
+The "context" can take any form: a prose description ("show a profile card with a photo on the left and name above bio on the right"), an attached screenshot or mockup image, an ASCII layout diagram, or actual Swift code. Translate whichever the user provided into a single `ContentView`.
+
+For example, this ASCII diagram:
+
+```
++------------------+--------------------------------------+
+|                  |           Name                       |
+|                  +--------------------------------------+
+|    Photo         |                                      |
+|                  |           Biography                  |
+|                  |                                      |
++------------------+--------------------------------------+
+```
+
+should become an `HStack` with the photo on the left and a `VStack { Name; Biography }` on the right, sized so the photo spans the full height. Match proportions and stacking direction faithfully; choose reasonable placeholder content (e.g. `Image(systemName: "person.crop.square.fill")`, sample text) when the input doesn't specify.
+
 ## How to render
 
-1. Generate or extract SwiftUI view code from the current context. The root view must be named `ContentView`. Helper views may be defined alongside.
+1. Derive SwiftUI view code from the current context — prose, image, ASCII diagram, or existing Swift. The root view must be named `ContentView`. Helper views may be defined alongside.
 2. Locate `agent-skill-swiftui.el` which lives alongside this skill file at `skills/swiftui-preview/agent-skill-swiftui.el` in the emacs-skills plugin directory.
 3. Invoke the elisp function in a single Bash call. To avoid shell+elisp quoting issues with arbitrary Swift code, pipe the source through `base64` and decode it on the elisp side:
    ```sh

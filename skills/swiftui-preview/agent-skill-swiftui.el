@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t; -*-
+
 (require 'cl-lib)
 
 (defvar agent-skill-swiftui--template "import SwiftUI
