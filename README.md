@@ -71,6 +71,16 @@ Build, install, and launch the app on an iOS Simulator. Reuses an already-booted
 
 Build, install, and launch the app on a wired-connected iOS device via Xcode 15+ `devicectl`. Requires a configured signing team and a trusted, paired device.
 
+### /orgmode
+
+Org-mode syntax and formatting knowledge (headings, lists, links, properties, timestamps, tables, source blocks). No Emacs daemon required.
+
+### /notes
+
+Create, search, edit, and link org-mode notes via emacsclient, backed by **vulpea**. Handles note creation, section editing, tag management, backlinks, and file attachments without bypassing the note database.
+
+> The org-mode skills (`/orgmode` and `/notes`) are vendored from [majorgreys/claude-orgmode](https://github.com/majorgreys/claude-orgmode) (MIT-licensed, see `LICENSE`).
+
 ### emacsclient (auto)
 
 Always prefer `emacsclient` over `emacs` when the agent needs to interact with Emacs. This skill is not a slash command; it activates automatically.
@@ -87,6 +97,7 @@ Search Apple Maps for restaurants, cafes, businesses, or landmarks via the [mapp
 
 - Emacs running a server (`M-x server-start` or `(server-start)` in your init file)
 - `emacsclient` available on `$PATH`
+- `/notes` skill additionally requires [vulpea](https://github.com/d12frosted/vulpea) installed in Emacs
 
 ## Install
 

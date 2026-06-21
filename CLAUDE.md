@@ -2,11 +2,11 @@
 
 ## What This Is
 
-A Claude Code plugin (claude-orgmode) with two skills:
+The org/vulpea note subsystem within the emacs-skills plugin. It contributes two skills:
 1. **orgmode** - Pure org-mode syntax and formatting knowledge
-2. **notes** - Note management via emacsclient (org-roam and vulpea backends, auto-detected)
+2. **notes** - Note management via emacsclient, backed by vulpea
 
-The elisp code and eval script are shared; the backend abstraction layer auto-detects org-roam or vulpea.
+The elisp code and eval script are shared; the backend is vulpea.
 
 ## Architecture
 
@@ -121,17 +121,3 @@ Before committing changes:
 3. Add tests for new functionality
 4. Update tests if changing existing behavior
 
-## Git Workflow
-
-**Branch-based workflow required:**
-1. Create feature branch (never commit to `master`)
-2. Make changes with tests (run `eldev -C --unstable test` before commit)
-3. Push branch and create PR
-4. Wait for approval before merge
-
-**Commit format:**
-```
-<conventional type>: <summary>
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
