@@ -17,7 +17,7 @@ allowed-tools:
 
 # Org-Mode Note Management
 
-Create, search, edit, and link org-mode notes via emacsclient. The backend (org-roam or vulpea) is auto-detected — the API is identical regardless of which is installed.
+Create, search, edit, and link org-mode notes via emacsclient. The backend is **vulpea** (which layers on org-roam as a transitive dependency).
 
 For org-mode syntax reference, see the **orgmode** skill.
 
@@ -39,7 +39,7 @@ For org-mode syntax reference, see the **orgmode** skill.
 
 **Prerequisites:**
 - Emacs daemon running: `emacs --daemon` or `emacs --fg-daemon=<name>`
-- org-roam or vulpea installed in Emacs (backend auto-detected)
+- vulpea installed in Emacs (org-roam loads as its transitive dependency)
 - Skill auto-loads on first use (no manual config needed)
 
 **Multi-daemon support:**
@@ -175,7 +175,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-check-setup)"
 
 ## Available Functions
 
-All functions use the `claude-orgmode-` prefix. The backend is auto-detected.
+All functions use the `claude-orgmode-` prefix.
 
 **Note Creation:**
 - `claude-orgmode-create-note` — Create new notes
@@ -236,5 +236,4 @@ Strip quotes from strings and parse structures as needed.
 - **${CLAUDE_PLUGIN_ROOT}/references/emacsclient-usage.md** — Detailed emacsclient patterns
 - **${CLAUDE_PLUGIN_ROOT}/references/installation.md** — Setup and configuration guide
 - **${CLAUDE_PLUGIN_ROOT}/references/troubleshooting.md** — Common issues and solutions
-- **org-roam-api.md** — Low-level org-roam API (read only if you need direct org-roam calls)
 - **vulpea-api.md** — Low-level vulpea API (read only if you need direct vulpea calls)

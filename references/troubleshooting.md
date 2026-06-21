@@ -28,7 +28,7 @@ Multiple named daemons (e.g., `myemacs` and `server`) are a supported configurat
 
 **Symptoms of accidentally connecting to the wrong daemon:**
 - Functions not found (skill loaded in other daemon)
-- Wrong org-roam directory or database
+- Wrong notes directory or database
 - Unexpected notes or missing results
 
 **Check running daemons:**
@@ -53,8 +53,8 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval -s myemacs "(claude-orgmode-do
 
 **Verify which daemon you're connected to:**
 ```bash
-emacsclient --socket-name myemacs --eval "org-roam-directory"
-emacsclient --socket-name server --eval "org-roam-directory"
+emacsclient --socket-name myemacs --eval "(claude-orgmode-doctor)"
+emacsclient --socket-name server --eval "(claude-orgmode-doctor)"
 ```
 
 ## Package Loading Issues
@@ -98,23 +98,23 @@ emacsclient --socket-name server --eval "org-roam-directory"
    emacsclient --eval "(featurep 'claude-orgmode)"
    ```
 
-### org-roam Not Loaded
+### vulpea Not Loaded
 
 **Symptoms:**
-- `org-roam-directory` not defined
-- org-roam functions not available
+- vulpea functions not available
+- `(featurep 'vulpea)` returns `nil`
 
 **Verify:**
 ```bash
-emacsclient --eval "(featurep 'org-roam)"
+emacsclient --eval "(featurep 'vulpea)"
 ```
 
 **Solution:**
 
-Add to Emacs init:
+Ensure vulpea is installed and loads on startup. For Doom:
 ```elisp
-(require 'org-roam)
-(org-roam-db-autosync-mode)
+;; In packages.el
+(package! vulpea)
 ```
 
 Restart daemon.
@@ -130,12 +130,12 @@ Restart daemon.
 
 **Check database:**
 ```bash
-emacsclient --eval "(file-exists-p org-roam-db-location)"
+emacsclient --eval "(file-exists-p vulpea-db-location)"
 ```
 
 **Solution:**
 ```bash
-emacsclient --eval "(org-roam-db-sync)"
+emacsclient --eval "(vulpea-db-sync-full-scan)"
 ```
 
 Wait for sync to complete (may take time for large note collections).
@@ -151,7 +151,7 @@ Wait for sync to complete (may take time for large note collections).
 
 Force full resync:
 ```bash
-emacsclient --eval "(org-roam-db-sync 'force)"
+emacsclient --eval "(vulpea-db-sync-full-scan)"
 ```
 
 ### Database Corruption
@@ -166,12 +166,12 @@ emacsclient --eval "(org-roam-db-sync 'force)"
 Rebuild database from scratch:
 ```bash
 # Backup first
-cp $(emacsclient --eval "org-roam-db-location") ~/org-roam-db-backup.db
+cp $(emacsclient --eval "vulpea-db-location") ~/vulpea-db-backup.db
 
 # Delete and rebuild
 emacsclient --eval "(progn
-  (delete-file org-roam-db-location)
-  (org-roam-db-sync))"
+  (delete-file vulpea-db-location)
+  (vulpea-db-sync-full-scan))"
 ```
 
 ## Note Creation Issues
@@ -208,54 +208,34 @@ emacsclient --eval "(claude-orgmode-create-note \"Title\" :tags '(\"tag\"))"
 Use `:content-file` instead of `:content` for complex content:
 
 ```bash
-TEMP=$(mktemp -t org-roam-content.XXXXXX)
+TEMP=$(mktemp -t orgmode-content.XXXXXX)
 cat > "$TEMP" << 'EOF'
 Your content with special characters, quotes, etc.
 EOF
 emacsclient --eval "(claude-orgmode-create-note \"Title\" :content-file \"$TEMP\")"
 ```
 
-### Title Duplication
-
-**Symptoms:**
-- `#+title:` appears twice in created notes
-
-**Cause:**
-Capture template includes `#+title:` in head.
-
-**Solution:**
-
-Use minimal head in template:
-```elisp
-(setq org-roam-capture-templates
-      '(("d" "default" plain "%?"
-         :target (file+head "%<%Y%m%d%H%M%S>.org" "${title}")
-         :unnarrowed t)))
-```
-
-The `"${title}"` creates the file, org-roam adds `#+title:` automatically.
-
 ### Content Not Being Formatted
 
 **Symptoms:**
-- Markdown content appears as-is in org-roam notes
+- Markdown content appears as-is in org notes
 - Content is not converted to org-mode format
 
 **Explanation:**
-As of v2.0, this skill no longer performs automatic markdown→org conversion. This is intentional to maintain separation of concerns.
+This skill does not perform automatic markdown→org conversion. This is intentional to maintain separation of concerns.
 
 **Solution:**
 
-Use the `orgmode` skill for general org-mode formatting before creating roam notes:
+Use the `orgmode` skill for general org-mode formatting before creating notes:
 
 ```bash
 # Step 1: Convert markdown to org (orgmode skill)
-# Step 2: Create roam note with org content (this skill)
+# Step 2: Create note with org content (this skill)
 ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval \
   "(claude-orgmode-create-note \"Title\" :content \"* Org content\")"
 ```
 
-This skill focuses on org-roam-specific operations (note creation, database sync, node linking). For general org-mode formatting, use the `orgmode` skill.
+This skill focuses on note operations (creation, database sync, node linking). For general org-mode formatting, use the `orgmode` skill.
 
 ## Search Issues
 
@@ -269,7 +249,7 @@ This skill focuses on org-roam-specific operations (note creation, database sync
 
 1. Sync database:
    ```bash
-   emacsclient --eval "(org-roam-db-sync)"
+   emacsclient --eval "(vulpea-db-sync-full-scan)"
    ```
 
 2. Check search term case (searches are case-insensitive):
@@ -277,9 +257,9 @@ This skill focuses on org-roam-specific operations (note creation, database sync
    emacsclient --eval "(claude-orgmode-search-by-title \"react\")"
    ```
 
-3. Verify note exists:
+3. Verify notes exist:
    ```bash
-   emacsclient --eval "(org-roam-node-list)"
+   emacsclient --eval "(vulpea-db-query)"
    ```
 
 ### Partial Matches Not Working
@@ -308,7 +288,7 @@ This skill focuses on org-roam-specific operations (note creation, database sync
 
 2. Sync database after creating links:
    ```bash
-   emacsclient --eval "(org-roam-db-sync)"
+   emacsclient --eval "(vulpea-db-sync-full-scan)"
    ```
 
 3. Verify link was actually inserted:
@@ -323,11 +303,10 @@ This skill focuses on org-roam-specific operations (note creation, database sync
 - Asymmetric connections
 
 **Check:**
-Both notes should have links. Verify manually:
+Both notes should have links. Verify via backlinks:
 ```bash
-# Open both notes
-emacsclient --eval "(find-file (org-roam-node-file (org-roam-node-from-title-or-alias \"Note A\")))"
-emacsclient --eval "(find-file (org-roam-node-file (org-roam-node-from-title-or-alias \"Note B\")))"
+emacsclient --eval "(claude-orgmode-get-backlinks-by-title \"Note A\")"
+emacsclient --eval "(claude-orgmode-get-backlinks-by-title \"Note B\")"
 ```
 
 Look for `id:` links in both files.
@@ -344,7 +323,7 @@ Look for `id:` links in both files.
 
 1. Check database size:
    ```bash
-   ls -lh $(emacsclient --eval "org-roam-db-location")
+   ls -lh $(emacsclient --eval "vulpea-db-location")
    ```
 
 2. For large databases, use specific searches:
@@ -369,7 +348,7 @@ emacs --daemon
 
 ## Permission Issues
 
-### Cannot Write to Org-roam Directory
+### Cannot Write to Notes Directory
 
 **Symptoms:**
 - "Permission denied" when creating notes
@@ -377,12 +356,12 @@ emacs --daemon
 
 **Check permissions:**
 ```bash
-ls -ld $(emacsclient --eval "org-roam-directory")
+ls -ld $(emacsclient --eval "org-directory")
 ```
 
 **Solution:**
 ```bash
-chmod 755 ~/Documents/org/roam
+chmod 755 ~/Documents/org
 ```
 
 ### Database Not Writable
@@ -393,12 +372,12 @@ chmod 755 ~/Documents/org/roam
 
 **Check:**
 ```bash
-ls -l $(emacsclient --eval "org-roam-db-location")
+ls -l $(emacsclient --eval "vulpea-db-location")
 ```
 
 **Fix:**
 ```bash
-chmod 644 $(emacsclient --eval "org-roam-db-location")
+chmod 644 $(emacsclient --eval "vulpea-db-location")
 ```
 
 ## Diagnostic Commands
@@ -412,10 +391,9 @@ emacsclient --eval "(claude-orgmode-doctor)"
 
 Checks:
 - Emacs version
-- org-roam version
+- vulpea version
 - Directory exists and accessible
 - Database status
-- Template configuration
 
 ### Check Package Status
 
@@ -423,14 +401,14 @@ Checks:
 # Check claude-orgmode loaded
 emacsclient --eval "(featurep 'claude-orgmode)"
 
-# Check org-roam loaded
-emacsclient --eval "(featurep 'org-roam)"
+# Check vulpea loaded
+emacsclient --eval "(featurep 'vulpea)"
 
 # Check database exists
-emacsclient --eval "(file-exists-p org-roam-db-location)"
+emacsclient --eval "(file-exists-p vulpea-db-location)"
 
-# Check directory configured
-emacsclient --eval "org-roam-directory"
+# Check notes directory configured
+emacsclient --eval "org-directory"
 ```
 
 ### Get System Info
@@ -439,14 +417,11 @@ emacsclient --eval "org-roam-directory"
 # Emacs version
 emacsclient --eval "(emacs-version)"
 
-# org-roam version
-emacsclient --eval "(pkg-info-version-info 'org-roam)"
+# vulpea version
+emacsclient --eval "(pkg-info-version-info 'vulpea)"
 
 # Database path
-emacsclient --eval "org-roam-db-location"
-
-# Capture templates
-emacsclient --eval "org-roam-capture-templates"
+emacsclient --eval "vulpea-db-location"
 ```
 
 ## Getting Help
@@ -457,4 +432,4 @@ If issues persist:
 2. **Check logs**: Look for errors in `*Messages*` buffer
 3. **Verify setup**: Ensure all prerequisites are met (see references/installation.md)
 4. **Restart daemon**: Often resolves transient issues
-5. **Check org-roam documentation**: Many issues are org-roam specific, not skill specific
+5. **Check vulpea documentation**: Many issues are vulpea-specific, not skill-specific

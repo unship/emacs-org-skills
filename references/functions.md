@@ -17,7 +17,7 @@ Detailed documentation for all claude-orgmode functions.
 
 ### claude-orgmode-create-note
 
-Create a new org-roam note with auto-detection of template format.
+Create a new org note via vulpea.
 
 **Signature**: `(claude-orgmode-create-note TITLE &key tags content content-file keep-file)`
 
@@ -42,7 +42,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-create-note \
 
 Large content via file:
 ```bash
-TEMP=$(mktemp -t org-roam-content.XXXXXX)
+TEMP=$(mktemp -t orgmode-content.XXXXXX)
 cat > "$TEMP" << 'EOF'
 * Section 1
 Content here
@@ -67,9 +67,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval \
 ```
 
 **Automatic Behaviors:**
-- Auto-detects filename format from `org-roam-capture-templates`
-- Generates proper filenames (timestamp-only, timestamp-slug, or custom)
-- Handles head content to avoid #+title duplication
+- Generates proper filenames (timestamp-based)
 - Sanitizes tags (replaces hyphens with underscores)
 - Returns file path of created note
 
@@ -395,7 +393,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(get-note-attachment-dir \"My
 
 ### claude-orgmode-check-setup
 
-Check if org-roam is properly configured.
+Check if vulpea is properly configured.
 
 **Signature**: `(claude-orgmode-check-setup)`
 
@@ -404,7 +402,7 @@ Check if org-roam is properly configured.
 ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-check-setup)"
 ```
 
-**Returns**: Status message about setup (directory exists, database initialized, etc.).
+**Returns**: Status message about setup (notes directory exists, database initialized, etc.).
 
 ### claude-orgmode-get-graph-stats
 
@@ -436,7 +434,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-find-orphan-n
 
 ### claude-orgmode-doctor
 
-Comprehensive diagnostic check of org-roam setup.
+Comprehensive diagnostic check of vulpea setup.
 
 **Signature**: `(claude-orgmode-doctor)`
 
@@ -447,10 +445,9 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-doctor)"
 
 **Checks:**
 - Emacs version
-- org-roam version
-- org-roam directory exists and is accessible
+- vulpea version
+- Notes directory exists and is accessible
 - Database location and status
-- Capture templates configuration
 - Database schema version
 
 **Returns**: Detailed diagnostic report.
@@ -471,11 +468,10 @@ You may need to:
 
 ## Best Practices
 
-1. Use `org-roam-node-*` functions for data access
-2. Use `org-roam-node-from-title-or-alias` for flexible searching
-3. Always check if nodes exist before operations
-4. Sync database after creating/modifying notes if needed
-5. Leverage org-roam's query functions rather than SQL directly
-6. Use `seq-filter` and `mapcar` for list operations
-7. Use `:content-file` for large content (automatic cleanup)
-8. Always use lists for tags: `'("tag1" "tag2")`
+1. Use `vulpea-note-*` functions for data access
+2. Use `vulpea-db-search-by-title` for flexible searching
+3. Always check if notes exist before operations
+4. Sync database after creating/modifying notes if needed: `(vulpea-db-sync-full-scan)`
+5. Use `seq-filter` and `mapcar` for list operations
+6. Use `:content-file` for large content (automatic cleanup)
+7. Always use lists for tags: `'("tag1" "tag2")`

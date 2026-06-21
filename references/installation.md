@@ -5,10 +5,10 @@ Simple installation guide for claude-orgmode.
 ## Prerequisites
 
 You need:
-1. **Emacs with org-roam installed and configured**
+1. **Emacs with vulpea installed and configured** (org-roam loads as vulpea's transitive dependency)
 2. **Emacs daemon running**: `emacs --daemon` or `emacs --fg-daemon=<name>`
-3. **org-roam directory set up**: Your notes directory (e.g., `~/org-roam/` or `~/Documents/org/roam/`)
-4. **org-roam database initialized**
+3. **Notes directory set up**: Your notes directory configured via `org-directory` (e.g., `~/Documents/org/`)
+4. **vulpea database initialized**
 
 That's it! No manual package loading or configuration needed.
 
@@ -40,21 +40,21 @@ For named daemons, specify the socket:
 emacsclient --socket-name myemacs --eval "t"
 ```
 
-### Check org-roam is installed
+### Check vulpea is installed
 
 ```bash
-emacsclient --eval "(featurep 'org-roam)"
+emacsclient --eval "(featurep 'vulpea)"
 ```
 
-Should return `t`. If not, install org-roam in Emacs.
+Should return `t`. If not, install vulpea in Emacs.
 
-### Find your org-roam directory
+### Find your notes directory
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "org-roam-directory"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "org-directory"
 ```
 
-Returns your configured org-roam directory path.
+Returns your configured notes directory path (`org-directory`).
 
 ### Run diagnostic
 
@@ -62,50 +62,7 @@ Returns your configured org-roam directory path.
 ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-doctor)"
 ```
 
-This checks your org-roam configuration, database, and templates.
-
-## Optional: Recommended org-roam Configuration
-
-For cleaner filenames, configure org-roam to use timestamp-only format.
-
-### For Doom Emacs
-
-Add to `~/.doom.d/config.el`:
-
-```elisp
-(setq org-roam-directory "~/Documents/org/roam/")
-
-(after! org-roam
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?"
-           :target (file+head "%<%Y%m%d%H%M%S>.org" "${title}")
-           :unnarrowed t))))
-```
-
-### For Vanilla Emacs
-
-Add to `~/.emacs.d/init.el`:
-
-```elisp
-(setq org-roam-directory "~/Documents/org/roam/")
-
-(with-eval-after-load 'org-roam
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?"
-           :target (file+head "%<%Y%m%d%H%M%S>.org" "${title}")
-           :unnarrowed t))))
-```
-
-### Why This is Optional
-
-- Creates files like `20251019193157.org` (clean)
-- Instead of `20251019193157-title-slug.org` (default)
-- **The skill auto-detects your template format**
-- Works with both formats automatically
-
-### Note on Title Duplication
-
-The `"${title}"` in the template prevents #+title duplication, as org-roam adds it automatically.
+This checks your vulpea configuration and database.
 
 ## Multi-Daemon Setup
 
@@ -137,7 +94,7 @@ ls /var/folders/*/*/T/emacs$(id -u)/ 2>/dev/null
 ls /run/user/$(id -u)/emacs/ 2>/dev/null || ls /tmp/emacs$(id -u)/ 2>/dev/null
 ```
 
-Each daemon loads `claude-orgmode` independently on first use. They may have different org-roam directories and databases.
+Each daemon loads `claude-orgmode` independently on first use. They may have different notes directories and databases.
 
 ## Common Setup Issues
 
@@ -147,31 +104,26 @@ Each daemon loads `claude-orgmode` independently on first use. They may have dif
 emacs --daemon
 ```
 
-### org-roam not installed
+### vulpea not installed
 
-Install org-roam package in Emacs. For Doom:
+Install vulpea package in Emacs. For Doom:
 ```elisp
 ;; In packages.el
-(package! org-roam)
+(package! vulpea)
 ```
 
 For vanilla Emacs, use package-install or your preferred package manager.
 
-### org-roam not loaded
+### vulpea not loaded
 
-Ensure org-roam loads on startup:
-
-```elisp
-(require 'org-roam)
-(org-roam-db-autosync-mode)
-```
+Ensure vulpea loads on startup. For Doom, the `+roam2` flag on the `org` module includes vulpea; otherwise add it explicitly to your config.
 
 ### Database not initialized
 
 Manually sync:
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(org-roam-db-sync)"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(vulpea-db-sync-full-scan)"
 ```
 
 ## Upgrading the Skill

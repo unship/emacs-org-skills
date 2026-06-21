@@ -1,6 +1,6 @@
 # Emacsclient Usage Guide
 
-This document explains how to use emacsclient with org-roam for this skill.
+This document explains how to use emacsclient with this skill.
 
 ## Basic Usage
 
@@ -59,14 +59,14 @@ emacsclient --eval "(function-name arg1 arg2)"
 emacsclient returns strings with quotes:
 
 ```bash
-emacsclient --eval "(org-roam-directory)"
-# Output: "/Users/user/org-roam"
+emacsclient --eval "org-directory"
+# Output: "/Users/user/Documents/org"
 ```
 
 To strip quotes in bash:
 
 ```bash
-result=$(emacsclient --eval "org-roam-directory")
+result=$(emacsclient --eval "org-directory")
 result=${result//\"/}  # Remove all quotes
 ```
 
@@ -85,12 +85,12 @@ Format output as strings within Elisp:
 
 ```bash
 emacsclient --eval "(mapcar
-  (lambda (node)
+  (lambda (note)
     (format \"%s|%s|%s\"
-      (org-roam-node-id node)
-      (org-roam-node-title node)
-      (org-roam-node-file node)))
-  (org-roam-node-list))"
+      (vulpea-note-id note)
+      (vulpea-note-title note)
+      (vulpea-note-path note)))
+  (vulpea-db-query))"
 ```
 
 Output will be a list of formatted strings.
@@ -100,8 +100,8 @@ Output will be a list of formatted strings.
 Use `princ` for clean output without quotes:
 
 ```bash
-emacsclient --eval "(princ (org-roam-directory))"
-# Output: /Users/user/org-roam (no quotes)
+emacsclient --eval "(princ org-directory)"
+# Output: /Users/user/Documents/org (no quotes)
 ```
 
 ## Common Patterns
@@ -118,10 +118,10 @@ emacsclient --eval "(progn
 
 ```bash
 emacsclient --eval "(progn
-  (org-roam-db-sync)
-  (let ((node (org-roam-node-from-title-or-alias \"Note Title\")))
-    (when node
-      (org-roam-node-id node))))"
+  (vulpea-db-sync-full-scan)
+  (let ((note (car (vulpea-db-search-by-title \"Note Title\"))))
+    (when note
+      (vulpea-note-id note))))"
 ```
 
 ### Pattern 3: Iteration with Output
@@ -136,35 +136,35 @@ emacsclient --eval "(dolist (tag (list-all-tags))
 ### Check if Function Exists
 
 ```bash
-emacsclient --eval "(fboundp 'org-roam-node-list)"
+emacsclient --eval "(fboundp 'vulpea-db-query)"
 # Returns: t if function exists, nil otherwise
 ```
 
 ### Check if Feature is Loaded
 
 ```bash
-emacsclient --eval "(featurep 'org-roam)"
-# Returns: t if org-roam is loaded
+emacsclient --eval "(featurep 'vulpea)"
+# Returns: t if vulpea is loaded
 ```
 
 ### Try-Catch Pattern
 
 ```bash
 emacsclient --eval "(condition-case err
-  (org-roam-node-from-title-or-alias \"Note\")
+  (car (vulpea-db-search-by-title \"Note\"))
   (error (message \"Error: %s\" err)))"
 ```
 
 ## Best Practices
 
-1. **Always require org-roam** if not loaded:
+1. **Always require vulpea** if not loaded:
    ```elisp
-   (require 'org-roam)
+   (require 'vulpea)
    ```
 
 2. **Sync database before queries**:
    ```elisp
-   (org-roam-db-sync)
+   (vulpea-db-sync-full-scan)
    ```
 
 3. **Use progn for multiple expressions**:
@@ -204,7 +204,7 @@ emacsclient --eval "(condition-case err
 ### Check what functions are available:
 
 ```bash
-emacsclient --eval "(apropos-command \"org-roam-node\")"
+emacsclient --eval "(apropos-command \"vulpea\")"
 ```
 
 ## Performance Considerations
@@ -219,23 +219,17 @@ emacsclient --eval "(apropos-command \"org-roam-node\")"
 ```bash
 #!/bin/bash
 
-# Load all helper scripts
-emacsclient --eval "(progn
-  (load-file \"$(pwd)/scripts/create-note.el\")
-  (load-file \"$(pwd)/scripts/search-notes.el\")
-  (load-file \"$(pwd)/scripts/insert-link.el\"))"
-
 # Sync database
-emacsclient --eval "(org-roam-db-sync)"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(vulpea-db-sync-full-scan)"
 
 # Create a note
-emacsclient --eval "(create-org-roam-note \"My New Note\" '(\"tag1\" \"tag2\"))"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-create-note \"My New Note\" :tags '(\"tag1\" \"tag2\"))"
 
 # Search for related notes
-results=$(emacsclient --eval "(search-notes-by-tag \"tag1\")")
+results=$(${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-search-by-tag \"tag1\")")
 
 # Insert link
-emacsclient --eval "(insert-link-in-note-by-title \"My New Note\" \"Existing Note\")"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-insert-link-in-note \"My New Note\" \"Existing Note\")"
 
 echo "Done!"
 ```

@@ -10,7 +10,7 @@ description: |
 
 Pure org-mode knowledge for writing and formatting `.org` files. No emacsclient or Emacs daemon required.
 
-For org-roam or vulpea note management (creating notes, searching, linking), use the **org-roam** or **vulpea** skills instead.
+For note management (creating notes, searching, linking), use the **notes** skill instead.
 
 ## Quick Reference
 
