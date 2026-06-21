@@ -1,0 +1,30 @@
+# Files and directories to exclude from .skill package
+# Per skill-creator principles: only include files needed for AI agent to function
+
+# Developer documentation (not needed for skill)
+README.md
+CLAUDE.md
+agent_docs/
+
+# Test suite (developer resources)
+test/
+
+# Git and development tools
+.git/
+.github/
+.gitignore
+
+# Build/development tools
+Eldev
+
+# Temporary and build artifacts
+*.elc
+*~
+\#*\#
+.\#*
+.DS_Store
+
+# Keep only these in the package:
+# - SKILL.md (required)
+# - *.el files (Emacs Lisp code)
+# - references/ (documentation for AI to read as needed)
