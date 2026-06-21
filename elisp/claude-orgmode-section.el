@@ -61,7 +61,7 @@ Point must be at a heading line.  START is after the heading's metadata
 at any level or end of buffer."
   (save-excursion
     (forward-line 1)
-    ;; Assumes PROPERTIES drawer precedes planning lines (org-id/org-roam convention).
+    ;; Assumes PROPERTIES drawer precedes planning lines (org-id convention).
     ;; Standard org-mode allows the reverse, but all nodes managed by this plugin
     ;; are created with PROPERTIES first.
     (claude-orgmode--skip-properties-drawer)

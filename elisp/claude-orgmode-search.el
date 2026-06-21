@@ -7,7 +7,7 @@
 
 ;;; Commentary:
 ;; Functions for searching notes by title, tag, and content.
-;; Supports both org-roam and vulpea backends.
+;; Vulpea backend.
 
 ;;; Code:
 

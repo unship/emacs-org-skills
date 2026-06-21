@@ -7,7 +7,7 @@
 
 ;;; Commentary:
 ;; Diagnostic functions for checking backend setup and configuration.
-;; Supports both org-roam and vulpea backends.
+;; Vulpea backend.
 
 ;;; Code:
 
@@ -26,70 +26,26 @@ Returns a detailed report of the configuration status."
     ;; Check 1: Backend detected
     (push (format "✓ Backend: %s" backend) checks)
 
-    (pcase backend
-      ('org-roam
-       ;; org-roam specific checks
-       (if (featurep 'org-roam)
-           (push "✓ org-roam is loaded" checks)
-         (push "✗ org-roam is NOT loaded" errors))
+    ;; vulpea specific checks
+    (if (featurep 'vulpea)
+        (push "✓ vulpea is loaded" checks)
+      (push "✗ vulpea is NOT loaded" errors))
 
-       (if (and (boundp 'org-roam-directory)
-                org-roam-directory
-                (file-directory-p org-roam-directory))
-           (push (format "✓ Notes directory exists: %s" org-roam-directory) checks)
-         (push (format "✗ Notes directory not found: %s"
-                       (if (boundp 'org-roam-directory) org-roam-directory "NOT SET"))
-               errors))
+    (let ((dir (claude-orgmode--backend-directory)))
+      (if (and dir (file-directory-p dir))
+          (push (format "✓ Notes directory exists: %s" dir) checks)
+        (push (format "✗ Notes directory not found: %s" (or dir "NOT SET")) errors))
 
-       (when (and (boundp 'org-roam-directory)
-                  org-roam-directory
-                  (file-directory-p org-roam-directory))
-         (if (file-writable-p org-roam-directory)
-             (push "✓ Notes directory is writable" checks)
-           (push (format "✗ Notes directory is NOT writable: %s" org-roam-directory) errors)))
+      (when (and dir (file-directory-p dir))
+        (if (file-writable-p dir)
+            (push "✓ Notes directory is writable" checks)
+          (push (format "✗ Notes directory is NOT writable: %s" dir) errors))))
 
-       (if (and (boundp 'org-roam-db-location)
-                org-roam-db-location
-                (file-exists-p org-roam-db-location))
-           (push (format "✓ Database exists: %s" org-roam-db-location) checks)
-         (push (format "⚠ Database not found (will be created on first sync): %s"
-                       (if (boundp 'org-roam-db-location) org-roam-db-location "NOT SET"))
-               warnings))
-
-       ;; Capture templates
-       (if (and (boundp 'org-roam-capture-templates)
-                org-roam-capture-templates)
-           (push (format "✓ Capture templates configured (%d template(s))"
-                         (length org-roam-capture-templates)) checks)
-         (push "⚠ org-roam-capture-templates not configured" warnings))
-
-       ;; Autosync
-       (if (and (boundp 'org-roam-db-autosync-mode)
-                org-roam-db-autosync-mode)
-           (push "✓ Database autosync mode enabled" checks)
-         (push "⚠ Database autosync mode not enabled" warnings)))
-
-      ('vulpea
-       ;; vulpea specific checks
-       (if (featurep 'vulpea)
-           (push "✓ vulpea is loaded" checks)
-         (push "✗ vulpea is NOT loaded" errors))
-
-       (let ((dir (claude-orgmode--backend-directory)))
-         (if (and dir (file-directory-p dir))
-             (push (format "✓ Notes directory exists: %s" dir) checks)
-           (push (format "✗ Notes directory not found: %s" (or dir "NOT SET")) errors))
-
-         (when (and dir (file-directory-p dir))
-           (if (file-writable-p dir)
-               (push "✓ Notes directory is writable" checks)
-             (push (format "✗ Notes directory is NOT writable: %s" dir) errors))))
-
-       ;; Autosync
-       (if (and (boundp 'vulpea-db-autosync-mode)
-                vulpea-db-autosync-mode)
-           (push "✓ Database autosync mode enabled" checks)
-         (push "⚠ Database autosync mode not enabled" warnings))))
+    ;; Autosync
+    (if (and (boundp 'vulpea-db-autosync-mode)
+             vulpea-db-autosync-mode)
+        (push "✓ Database autosync mode enabled" checks)
+      (push "⚠ Database autosync mode not enabled" warnings))
 
     ;; Backend-agnostic checks
     (condition-case err

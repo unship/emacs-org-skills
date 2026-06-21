@@ -7,7 +7,7 @@
 
 ;;; Commentary:
 ;; Functions for managing backlinks, forward links, and link insertion.
-;; Supports both org-roam and vulpea backends.
+;; Vulpea backend.
 
 ;;; Code:
 

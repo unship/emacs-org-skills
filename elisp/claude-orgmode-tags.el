@@ -7,7 +7,7 @@
 
 ;;; Commentary:
 ;; Functions for managing tags in notes.
-;; Supports both org-roam and vulpea backends.
+;; Vulpea backend.
 
 ;;; Code:
 

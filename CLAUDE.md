@@ -17,7 +17,7 @@ The elisp code and eval script are shared; the backend is vulpea.
 
 **Shared code:**
 - `elisp/claude-orgmode.el` - Main package loading all modules
-- `elisp/claude-orgmode-backend.el` - Backend auto-detection (org-roam vs vulpea)
+- `elisp/claude-orgmode-backend.el` - Backend abstraction (vulpea-only)
 - `elisp/claude-orgmode-*.el` - Modular implementations (core, create, section, search, links, tags, attach, utils, doctor)
 - `scripts/claude-orgmode-eval` - Auto-load wrapper script
 
@@ -53,16 +53,17 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval -s myemacs "(claude-orgmode-cr
 
 ### Backend Abstraction
 
-`elisp/claude-orgmode-backend.el` auto-detects the active backend:
-1. Checks if `org-roam` or `vulpea` feature is already loaded
-2. Tries to require `org-roam`, then `vulpea`
-3. Caches result in `claude-orgmode--backend` variable
+`elisp/claude-orgmode-backend.el` targets vulpea, the only supported backend
+(vulpea is built on org-roam, which loads as a transitive dependency):
+1. Resolves vulpea lazily on first use (`require 'vulpea`), signalling an error if it is unavailable
+2. Caches the result in the `claude-orgmode--backend` variable
 
-All modules use `claude-orgmode--backend-*` dispatch functions instead of direct org-roam or vulpea calls.
+All modules call `claude-orgmode--backend-*` helpers, which wrap the vulpea API in a stable interface.
 
 ### Note Creation
 
-**`claude-orgmode-create-note`** creates files directly with proper structure (PROPERTIES block, ID, title, filetags). For org-roam, it reads the user's capture templates. For vulpea, it delegates to `vulpea-create`.
+**`claude-orgmode-create-note`** delegates to `vulpea-create`, sanitizing tags
+(hyphens become underscores) before creation.
 
 **Implementation reference:** `elisp/claude-orgmode-create.el`
 

@@ -7,7 +7,7 @@
 
 ;;; Commentary:
 ;; Utility functions including orphan detection and stats.
-;; Supports both org-roam and vulpea backends.
+;; Vulpea backend.
 
 ;;; Code:
 

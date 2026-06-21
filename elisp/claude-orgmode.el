@@ -11,10 +11,9 @@
 ;;; Commentary:
 
 ;; This package provides functions for programmatic org-mode note management
-;; via emacsclient, supporting both org-roam and vulpea backends.
+;; via emacsclient, backed by the vulpea backend.
 ;;
 ;; Key features:
-;; - Auto-detect org-roam or vulpea backend
 ;; - Create notes with automatic template detection
 ;; - Search and query notes
 ;; - Manage backlinks and connections
@@ -31,7 +30,7 @@
 
 ;;; Code:
 
-;; Backend detection (org-roam or vulpea) - detected lazily on first use
+;; Backend (vulpea) - resolved lazily on first use
 (require 'claude-orgmode-backend)
 
 ;; Load all modules
