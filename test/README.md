@@ -9,7 +9,7 @@ an in-memory note store plus `fset` stubs (see `test-helper.el`). The mock's
 `vulpea-create` writes real `.org` files into a per-test temporary directory, so
 file-existence checks, content assertions, and the section-editing code (which
 re-opens the file and navigates by `:ID:`) all run against real files without a
-real vulpea/org-roam install.
+real vulpea install.
 
 ## Test Structure
 

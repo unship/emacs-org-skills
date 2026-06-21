@@ -52,8 +52,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval -s myemacs "(claude-orgmode-cr
 
 ### Backend Abstraction
 
-`elisp/claude-orgmode-backend.el` targets vulpea, the only supported backend
-(vulpea is built on org-roam, which loads as a transitive dependency):
+`elisp/claude-orgmode-backend.el` targets vulpea, the only supported backend:
 1. Resolves vulpea lazily on first use (`require 'vulpea`), signalling an error if it is unavailable
 2. Caches the result in the `claude-orgmode--backend` variable
 

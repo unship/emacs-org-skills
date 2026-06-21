@@ -3,7 +3,7 @@ name: notes
 description: |
   Org-mode note management via emacsclient. Create, search, edit, and link org notes. Never use Read/Write/Edit on org notes directly.
 
-  Use this skill whenever the user mentions org-mode notes, org notes, .org files for notes, roam notes, org-roam, vulpea, Zettelkasten, backlinks, knowledge graph, PKM, second brain, or wants to create, update, edit, search, or link notes in org-mode. Also use when the user asks to update a section, append to a note, or replace note content — the section editing API handles this without creating duplicates.
+  Use this skill whenever the user mentions org-mode notes, org notes, .org files for notes, vulpea, Zettelkasten, backlinks, knowledge graph, PKM, second brain, or wants to create, update, edit, search, or link notes in org-mode. Also use when the user asks to update a section, append to a note, or replace note content — the section editing API handles this without creating duplicates.
 allowed-tools:
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval:*)
   - Bash(git status:*)
@@ -17,7 +17,7 @@ allowed-tools:
 
 # Org-Mode Note Management
 
-Create, search, edit, and link org-mode notes via emacsclient. The backend is **vulpea** (which layers on org-roam as a transitive dependency).
+Create, search, edit, and link org-mode notes via emacsclient. The backend is **vulpea**.
 
 For org-mode syntax reference, see the **orgmode** skill.
 
@@ -39,7 +39,7 @@ For org-mode syntax reference, see the **orgmode** skill.
 
 **Prerequisites:**
 - Emacs daemon running: `emacs --daemon` or `emacs --fg-daemon=<name>`
-- vulpea installed in Emacs (org-roam loads as its transitive dependency)
+- vulpea installed in Emacs
 - Skill auto-loads on first use (no manual config needed)
 
 **Multi-daemon support:**

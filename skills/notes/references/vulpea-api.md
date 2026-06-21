@@ -1,7 +1,7 @@
 # Vulpea API Reference
 
 This document provides a quick reference for commonly used vulpea functions.
-Vulpea is an alternative backend to org-roam for managing org-mode notes.
+Vulpea is the backend for managing org-mode notes.
 
 ## Note Functions
 
@@ -82,7 +82,7 @@ Example:
 
 ## ID Functions
 
-These are standard org-mode functions shared with org-roam:
+These are standard org-mode (org-id) functions:
 
 - `(org-id-uuid)` - Generate a new UUID
 - `(org-id-get-create)` - Get or create ID for current entry
@@ -130,17 +130,3 @@ These are standard org-mode functions shared with org-roam:
     (insert-file-contents (vulpea-note-path note))
     (buffer-string)))
 ```
-
-## Differences from Org-roam
-
-| Operation | Org-roam | Vulpea |
-|-----------|----------|--------|
-| All nodes | `(org-roam-node-list)` | `(vulpea-db-query)` |
-| By ID | `(org-roam-node-from-id ID)` | `(vulpea-db-get-by-id ID)` |
-| By title | `(org-roam-node-from-title-or-alias T)` | `(car (vulpea-db-search-by-title T))` |
-| File path | `(org-roam-node-file N)` | `(vulpea-note-path N)` |
-| Backlinks | `(org-roam-backlinks-get N)` | `(vulpea-db-query-links-to ID)` |
-| DB sync | `(org-roam-db-sync)` | `(vulpea-db-sync-full-scan)` |
-| Add tag | Manual filetags edit | `(vulpea-tags-add N TAG)` |
-| Remove tag | Manual filetags edit | `(vulpea-tags-remove N TAG)` |
-| Create note | `claude-orgmode-create-note` | `(vulpea-create TITLE ...)` |

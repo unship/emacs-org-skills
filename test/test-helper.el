@@ -3,7 +3,7 @@
 ;;; Commentary:
 ;; Shared test fixtures and utilities using Buttercup.
 ;;
-;; The suite is MOCKED: there is no real vulpea / org-roam install.  We force
+;; The suite is MOCKED: there is no real vulpea install.  We force
 ;; the backend to `vulpea' and `fset' an in-memory note store in place of the
 ;; vulpea API.  `vulpea-create' writes a real `.org' file into a per-test temp
 ;; directory (so `file-exists-p', content assertions, and the section-editing

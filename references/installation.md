@@ -5,7 +5,7 @@ Simple installation guide for claude-orgmode.
 ## Prerequisites
 
 You need:
-1. **Emacs with vulpea installed and configured** (org-roam loads as vulpea's transitive dependency)
+1. **Emacs with vulpea installed and configured**
 2. **Emacs daemon running**: `emacs --daemon` or `emacs --fg-daemon=<name>`
 3. **Notes directory set up**: Your notes directory configured via `org-directory` (e.g., `~/Documents/org/`)
 4. **vulpea database initialized**
@@ -116,7 +116,7 @@ For vanilla Emacs, use package-install or your preferred package manager.
 
 ### vulpea not loaded
 
-Ensure vulpea loads on startup. For Doom, the `+roam2` flag on the `org` module includes vulpea; otherwise add it explicitly to your config.
+Ensure vulpea loads on startup. For Doom, add `(package! vulpea)` to `packages.el` and a `(use-package! vulpea ...)` block to `config.el`; for vanilla Emacs, install vulpea and `(require 'vulpea)` in your init.
 
 ### Database not initialized
 

@@ -61,7 +61,7 @@ Content should be in org-mode format. For markdown conversion or general org-mod
 Example workflow:
 ```bash
 # Step 1: Convert markdown to org (orgmode skill)
-# Step 2: Create roam note with org content (this skill)
+# Step 2: Create note with org content (this skill)
 ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval \
   "(claude-orgmode-create-note \"Title\" :content \"* Org heading\")"
 ```

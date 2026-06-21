@@ -6,9 +6,8 @@
 ;; Keywords: outlines convenience
 
 ;;; Commentary:
-;; Backend abstraction layer targeting vulpea.  Vulpea is the only
-;; supported backend (it is built on top of org-roam, which is loaded
-;; as a transitive dependency).  Backend resolution is lazy and cached.
+;; Backend abstraction layer targeting vulpea, the only supported
+;; backend.  Backend resolution is lazy and cached.
 
 ;;; Code:
 
