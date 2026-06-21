@@ -29,7 +29,6 @@ The elisp code and eval script are shared; the backend is vulpea.
 
 **Skill-specific references:**
 - `skills/orgmode/references/` - org-syntax.md, properties.md, timestamps.md, links.md, examples.md
-- `skills/notes/references/org-roam-api.md` - Org-roam low-level API reference
 - `skills/notes/references/vulpea-api.md` - Vulpea low-level API reference
 
 ## Auto-Load Architecture
