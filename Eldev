@@ -7,10 +7,13 @@
 (eldev-use-package-archive 'gnu)
 (eldev-use-package-archive 'melpa)
 
-;; Additional dependencies not auto-detected
-;; org-roam is optional at runtime (vulpea is an alternative) but required for tests
-;; org-download is optional at runtime (only needed for attach-file-to-references)
-(eldev-add-extra-dependencies 'test 'org-roam 'org-download)
+;; Additional dependencies not auto-detected.
+;; The test suite mocks the vulpea backend entirely (an in-memory note store
+;; plus `fset' stubs in test/test-helper.el), so no note-taking backend package
+;; (vulpea / org-roam) needs to be installed to run the tests.
+;; org-download is only `require'd lazily inside
+;; `claude-orgmode-attach-file-to-references' (never at load time), so it is not
+;; needed to load or test the package either.
 
 ;; Add elisp directory to load path
 (add-to-list 'load-path (expand-file-name "elisp" eldev-project-dir))

@@ -1,156 +1,127 @@
 # claude-orgmode Tests
 
-This directory contains Buttercup tests for claude-orgmode.
+This directory contains [Buttercup](https://github.com/jorgenschaefer/emacs-buttercup)
+tests for claude-orgmode.
+
+The suite is **mocked**: it does not install or require a real note-taking
+backend. The backend is forced to `vulpea` and the vulpea API is replaced with
+an in-memory note store plus `fset` stubs (see `test-helper.el`). The mock's
+`vulpea-create` writes real `.org` files into a per-test temporary directory, so
+file-existence checks, content assertions, and the section-editing code (which
+re-opens the file and navigates by `:ID:`) all run against real files without a
+real vulpea/org-roam install.
 
 ## Test Structure
 
 ```
 test/
-├── README.md                           # This file
-├── test-helper.el                      # Test utilities and fixtures
-├── claude-orgmode-test.el             # Unit tests
-└── claude-orgmode-integration-test.el # Integration tests
+├── README.md                            # This file
+├── test-helper.el                       # Mocked vulpea harness + fixtures
+├── claude-orgmode-test.el               # Unit tests
+├── claude-orgmode-integration-test.el   # Integration workflows
+└── claude-orgmode-plugin-test.el        # Plugin structure + full-API workflow
 ```
 
 ## Test Types
 
 ### Unit Tests (`claude-orgmode-test.el`)
-Tests individual functions in isolation using Buttercup's `describe`/`it` syntax:
-- Tag sanitization
-- Filename generation
-- Doctor/diagnostic functions
+Backend-agnostic helpers tested directly, plus backend dispatch tested against
+the mocked vulpea API:
+- Tag sanitization (`claude-orgmode--sanitize-tag`)
+- Time-format expansion (`claude-orgmode--expand-time-formats`)
+- Org-syntax validation (`claude-orgmode--validate-org-syntax`)
+- Content-file reading (`claude-orgmode--read-content-file`)
+- Temp-file detection (`claude-orgmode--looks-like-temp-file`)
+- `claude-orgmode-create-note`: content, content-file priority, temp-file
+  cleanup / `:keep-file`, and the tag-sanitization regression guard (verifies
+  the sanitized tag is what reaches `vulpea-create`)
+- Backend dispatch: each `claude-orgmode--backend-*` function is spied on and
+  asserted to call the correct `vulpea-*` function with the correct arguments
 
 ### Integration Tests (`claude-orgmode-integration-test.el`)
-Tests complete workflows with a temporary org-roam database:
-- Note creation with various options
-- Searching and querying notes
-- Creating and managing links
-- Tag management
-- Utility functions (orphan detection, statistics)
-- Edge cases and error handling
+Complete workflows against the in-memory store and real `.org` files:
+- Note creation (basic, with content, tag sanitization)
+- Search (by title, by tag, by node)
+- Links (bidirectional, forward links, backlinks)
+- Tag management (list, count, add, notes without tags)
+- Utilities (orphan detection, recent notes, graph stats)
+- Section editing (get / create / replace / append / delete) — each test writes
+  a real `.org` file with known IDs and registers them via
+  `claude-orgmode-test--register-note`
+- Edge cases (empty store, nonexistent notes)
+
+### Plugin Tests (`claude-orgmode-plugin-test.el`)
+- Plugin structure: `marketplace.json` validity (merged
+  `xenodium-emacs-skills` marketplace), org skill `SKILL.md` files, the eval
+  script, and shared reference docs
+- Package loading: all modules, public API functions, and backend dispatch
+  functions are defined
+- Full-API workflow against the mocked vulpea backend
 
 ## Running Tests
 
-### Using Eldev (Recommended)
+The project uses [Eldev](https://github.com/doublep/eldev). Mocked tests need no
+backend package — Eldev only pulls in Buttercup.
 
-The project uses [Eldev](https://github.com/doublep/eldev) for dependency management and testing, following org-roam's conventions.
-
-**Prerequisites:**
-- Eldev must be installed
-
-**Install Eldev:**
+**Install Eldev** (if not already on `PATH`):
 ```bash
-curl -fsSL https://raw.github.com/doublep/eldev/master/webinstall/github-eldev | sh
+curl -fsSL https://raw.githubusercontent.com/doublep/eldev/master/bin/eldev \
+  -o "$HOME/.eldev/bin/eldev" && chmod +x "$HOME/.eldev/bin/eldev"
+export PATH="$HOME/.eldev/bin:$PATH"
 ```
 
 **Run tests:**
 ```bash
-# Install dependencies (first time only)
+# Install test dependencies (first time only)
 eldev -C --unstable prepare
 
 # Run all tests
 eldev -C --unstable test
-
-# Run linting
-eldev -C --unstable lint
 ```
 
-This automatically:
-- Downloads and installs org-roam and dependencies
-- Runs all tests in isolation
-- Reports results in Buttercup format
-
-**Eldev provides:**
-- Automatic dependency management
-- Isolated package environment
-- Fast iteration without rebuilds
-- Consistent with org-roam's testing approach
-
-### Interactive Development
-
-For interactive testing during development:
-
+If your Emacs build has a broken native compiler (e.g. `libgccjit` link
+errors), disable native compilation for the run:
 ```bash
-# Run Eldev in interactive mode
-eldev -C --unstable emacs
-
-# Then from Emacs:
-M-x buttercup-run
+eldev -C --unstable \
+  -S '(setq native-comp-jit-compilation nil native-comp-enable-subr-trampolines nil)' \
+  test
 ```
 
-Or run specific test files:
+Run a single file:
 ```bash
 eldev -C --unstable test test/claude-orgmode-test.el
 ```
 
-## Test Coverage
-
-### Current Coverage
-
-**Unit Tests:**
-- ✅ Tag sanitization (`claude-orgmode--sanitize-tag`)
-- ✅ Filename generation (`claude-orgmode--expand-filename`)
-- ✅ Diagnostic checks (`claude-orgmode-doctor-quick`, `check-org-roam-setup`)
-
-**Integration Tests:**
-- ✅ Note creation (basic, with content, tag sanitization)
-- ✅ Search (by title, by tag, by node)
-- ✅ Links (bidirectional, forward links)
-- ✅ Tag management (list, count, add, notes without tags)
-- ✅ Utilities (orphan detection, recent notes, graph stats)
-- ✅ Edge cases (empty database, nonexistent notes)
-
-### Not Yet Covered
-
-- Attachment functions (requires org-attach setup)
-- Content search functionality
-- Remove tag from note
-- Multiple link insertion
-- Database sync edge cases
-
-## Writing New Tests
-
-### Unit Test Example
-
-```elisp
-(ert-deftest my-unit-test ()
-  "Test description."
-  (should (equal expected-value (my-function input))))
-```
-
-### Integration Test Example
-
-```elisp
-(ert-deftest my-integration-test ()
-  "Test description."
-  (claude-orgmode-test-with-temp-db
-   (let ((file-path (create-org-roam-note "Test" '("tag"))))
-     (should (file-exists-p file-path))
-     (should (claude-orgmode-test--node-exists-p "Test")))))
-```
-
-### Helper Functions
+## Helper Functions
 
 Available in `test-helper.el`:
 
-- `claude-orgmode-test-with-temp-db` - Macro for temporary database
-- `claude-orgmode-test--create-test-note` - Create test note
-- `claude-orgmode-test--count-nodes` - Count nodes in database
-- `claude-orgmode-test--get-note-content` - Get file content
-- `claude-orgmode-test--node-exists-p` - Check if node exists
+- `claude-orgmode-test--setup` / `claude-orgmode-test--teardown` — install the
+  mocks, create/destroy the temp note directory, set/reset
+  `claude-orgmode--backend`
+- `claude-orgmode-test--register-note (id path &optional level title tags)` —
+  register a note in the mock store so backend lookups by ID resolve to a real
+  `.org` file with the given `:level` (used by the section-editing tests)
+- `claude-orgmode-test--count-nodes` — number of notes in the store
+- `claude-orgmode-test--get-note-content` — read a note file's contents
+- `claude-orgmode-test--node-exists-p` — whether a note with a title exists
+
+The mock exposes the temp note directory as `claude-orgmode-test-directory`.
 
 ## Test Guidelines
 
-1. **Use descriptive test names**: Prefix with `claude-orgmode-test-` or `claude-orgmode-integration-test-`
-2. **Test one thing per test**: Keep tests focused and atomic
-3. **Use temp database for integration tests**: Always use `claude-orgmode-test-with-temp-db` macro
-4. **Clean up after tests**: The test helper handles cleanup automatically
-5. **Document expected behavior**: Add clear docstrings to tests
-6. **Test edge cases**: Include tests for error conditions and boundary cases
+1. Use descriptive `describe`/`it` names.
+2. Test one behavior per spec.
+3. Wrap stateful specs with `claude-orgmode-test--setup` /
+   `claude-orgmode-test--teardown` (via `before-each` / `after-each`).
+4. Assert behavior, not implementation: a mocked dispatch test must still
+   assert the correct `vulpea-*` function was reached with the right arguments;
+   backend-agnostic logic (sanitization, temp-file cleanup, section edits) is
+   asserted on real inputs/outputs.
 
 ## Continuous Integration
 
-For CI/CD pipelines (GitHub Actions, GitLab CI, etc.), use batch mode:
+For CI, Buttercup runs in batch mode via Eldev; no backend package is needed:
 
 ```yaml
 # .github/workflows/test.yml
@@ -161,49 +132,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        emacs_version: ['27.1', '28.2', '29.1']
+        emacs_version: ['27.2', '28.2', '29.1']
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: purcell/setup-emacs@master
         with:
           version: ${{ matrix.emacs_version }}
-      - name: Install dependencies
-        run: |
-          emacs --batch --eval "(require 'package)" \
-            --eval "(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\"))" \
-            --eval "(package-refresh-contents)" \
-            --eval "(package-install 'org-roam)"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.eldev
+          key: eldev-${{ matrix.emacs_version }}
+      - name: Install Eldev
+        run: curl -fsSL https://raw.github.com/doublep/eldev/master/webinstall/eldev | sh
       - name: Run tests
         run: eldev -C --unstable test
 ```
 
 ## Troubleshooting
 
-### Tests fail with "org-roam not loaded"
+### Native compiler errors (`libgccjit`, `ld: library not found`)
 
-Make sure org-roam is installed and in your load path:
-```elisp
-(package-install 'org-roam)
-```
-
-### Database conflicts
-
-Tests use temporary databases that are cleaned up automatically. If you see database errors, ensure no other Emacs process is accessing the test database.
+Some local Emacs builds ship a broken native compiler. Disable it for the run
+with the `-S` flag shown under [Running Tests](#running-tests).
 
 ### Permission errors on temporary directories
 
-The test suite creates temporary directories under your system temp directory. Ensure you have write permissions.
-
-## Contributing Tests
-
-When adding new features to claude-orgmode:
-
-1. Add unit tests for new utility functions
-2. Add integration tests for workflows
-3. Update this README with coverage information
-4. Ensure all tests pass before submitting PR
-
-Run tests locally before committing:
-```bash
-eldev -C --unstable test
-```
+The suite creates temp directories under the system temp directory. Ensure you
+have write permission there.
