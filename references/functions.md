@@ -354,40 +354,51 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-list-attachme
 
 **Returns**: List of attachment filenames.
 
-### get-attachment-path
+### claude-orgmode-get-attachment-path
 
 Get full path to a specific attachment.
 
-**Signature**: `(get-attachment-path TITLE FILENAME)`
+**Signature**: `(claude-orgmode-get-attachment-path TITLE FILENAME)`
 
 **Example:**
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(get-attachment-path \"My Note\" \"document.pdf\")"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-get-attachment-path \"My Note\" \"document.pdf\")"
 ```
 
-### delete-note-attachment
+### claude-orgmode-delete-attachment
 
 Delete an attachment from a note.
 
-**Signature**: `(delete-note-attachment TITLE FILENAME)`
+**Signature**: `(claude-orgmode-delete-attachment TITLE FILENAME)`
 
 **Example:**
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(delete-note-attachment \"My Note\" \"old-file.pdf\")"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-delete-attachment \"My Note\" \"old-file.pdf\")"
 ```
 
-### get-note-attachment-dir
+### claude-orgmode-get-attachment-dir
 
 Get the attachment directory path for a note.
 
-**Signature**: `(get-note-attachment-dir TITLE)`
+**Signature**: `(claude-orgmode-get-attachment-dir TITLE)`
 
 **Example:**
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(get-note-attachment-dir \"My Note\")"
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-get-attachment-dir \"My Note\")"
 ```
 
 **Returns**: Path to note's attachment directory.
+
+### claude-orgmode-attach-file-to-references
+
+Attach a file and add a visible link to it under the note's References section (preferred over `claude-orgmode-attach-file` when you want the attachment surfaced in the note body).
+
+**Signature**: `(claude-orgmode-attach-file-to-references TITLE PATH)`
+
+**Example:**
+```bash
+${CLAUDE_PLUGIN_ROOT}/scripts/claude-orgmode-eval "(claude-orgmode-attach-file-to-references \"My Note\" \"/path/to/document.pdf\")"
+```
 
 ## Utility Functions
 
